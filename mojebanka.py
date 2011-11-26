@@ -156,6 +156,15 @@ def number_format(number, decimals = 0, dec_point = '.', thousands_sep = ','):
     else:
         return '%s%s' % (neg and '-' or '', thousands_sep.join(parts))
 
+def _collect_files_from_args(args):
+    files = []
+    for file in args:
+        new_files = glob.glob(file)
+        for new_file in new_files:
+            if new_file not in files:
+                files.append(new_file)
+
+    return files
 
 ################################################################################
 ## MAIN LOOP 
@@ -169,12 +178,7 @@ if __name__ == '__main__':
 
     (options, args) = optparser.parse_args()
 
-    files = []
-    for file in args:
-        new_files = glob.glob(file);
-        for new_file in new_files:
-            if new_file not in files:
-                files.append(new_file)
+    files = _collect_files_from_args(args)
 
     if len(files):
         files = list(set(files))
