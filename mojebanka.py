@@ -4,6 +4,7 @@
 import re
 import codecs
 import time
+import sys
 
 class ParserInvalidTransaction(Exception): pass
 
@@ -171,12 +172,19 @@ if __name__ == '__main__':
     else:
         optparser.print_help();
 
-    for file in files:            
-        fin = codecs.open(file, 'r', 'cp1250')
-        content = fin.read()
-        transactions = mojebanka_txt_parse(content)
-        if options.format == 'cvs':        
-            mojebanka_to_cvs(transactions)
-        else:
-            mojebanka_to_qif(transactions)
-        fin.close()
+    fin = None
+    try:
+        for file in files:
+            fin = codecs.open(file, 'r', 'cp1250')
+            content = fin.read()
+            transactions = mojebanka_txt_parse(content)
+            if options.format == 'cvs':
+                mojebanka_to_cvs(transactions)
+            else:
+                mojebanka_to_qif(transactions)
+            fin.close()
+    except EnvironmentError as err:
+        print "{0}: chyba při konverzi: {1}".format(os.path.basename(file), err)
+    finally:
+        if fin is not None:
+            fin.close()
