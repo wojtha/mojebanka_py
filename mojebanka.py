@@ -26,6 +26,9 @@ class ParserInvalidTransaction(Exception): pass
 # - desc4     ...
 
 def mojebanka_txt_parse(content):
+    """
+    Returns list of parsed transactions (as dictionaries) from given content.
+    """
     transactions = []
     cells = content.split('________________________________________________________________________________')
     re_skip = re.compile(u".*(ČÍSLO ÚČTU : |Obrat na vrub|Číslo protiúčtu                VS|Transakční historie|Za období      od).*", re.DOTALL)
@@ -122,8 +125,8 @@ def mojebanka_to_qif(transactions):
             fout.close()
 
 
-
 def date_filename(ext):
+    """ Returns filename with timestamp and given extension """
     return "mojebanka_export_" + time.strftime("%Y-%d-%m-%H-%M-%S") + "." + ext
 
 
@@ -156,7 +159,9 @@ def number_format(number, decimals = 0, dec_point = '.', thousands_sep = ','):
     else:
         return '%s%s' % (neg and '-' or '', thousands_sep.join(parts))
 
+
 def _collect_files_from_args(args):
+    """ Returns list of unique files which using the glob file matching. """
     files = []
     for file in args:
         new_files = glob.glob(file)
@@ -165,6 +170,7 @@ def _collect_files_from_args(args):
                 files.append(new_file)
 
     return files
+
 
 ################################################################################
 ## MAIN LOOP 
