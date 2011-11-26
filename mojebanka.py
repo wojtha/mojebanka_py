@@ -71,6 +71,7 @@ def mojebanka_txt_parse(content):
 
 def mojebanka_to_cvs(transactions):
     """ Save array of transactions to CVS file. """
+    fout = None
     try:
         filename = date_filename('cvs')
         fout = open(filename, 'w+')
@@ -82,35 +83,43 @@ def mojebanka_to_cvs(transactions):
             for col in columns:
                 data.append(tr[col]);
             fout.write("\t".join(data))
+    except EnvironmentError as err:
+        print "{0}: chyba zápisu: {1}".format(os.path.basename(file), err)
     finally:
-        fout.close()
+        if fout is not None:
+            fout.close()
 
 
 def mojebanka_to_qif(transactions):
     """ Save array of transactions to QIF file. """
-    filename = date_filename('qif')
-    qif_file = codecs.open(filename, 'w+', 'utf-8')
-    qif_file.write("!Type:Bank\n")
+    fout = None
+    try:
+        filename = date_filename('qif')
+        fout = codecs.open(filename, 'w+', 'utf-8')
+        fout.write("!Type:Bank\n")
 
-    for tr in transactions:
-        amount = re.sub('\+?(-?)(\d+),(\d{2}) CZK', '\g<1>\g<2>.\g<3>', tr['price'])
-        if tr['account'] == '\0100':
-            payee = 'KB'
-        else:
-            payee = tr['account']
+        for tr in transactions:
+            amount = re.sub('\+?(-?)(\d+),(\d{2}) CZK', '\g<1>\g<2>.\g<3>', tr['price'])
+            if tr['account'] == '\0100':
+                payee = 'KB'
+            else:
+                payee = tr['account']
 
-        if tr['var_sym']:
-          payee += ' ' + tr['var_sym']
+            if tr['var_sym']:
+              payee += ' ' + tr['var_sym']
 
-        data = '';
-        data += 'D' + time.strftime('%d/%m/%Y', tr['date1']) + "\n"
-        data += 'T' + number_format (amount, 2) + "\n"
-        data += 'P' + payee + "\n"
-        data += 'M' + tr['desc1'] + ' ' + tr['desc2'] + ' ' + tr['desc3'] + ' ' + tr['desc4'] + "\n"
-        data += "^\n"
-        qif_file.write(data)
-
-    qif_file.close()
+            data = '';
+            data += 'D' + time.strftime('%d/%m/%Y', tr['date1']) + "\n"
+            data += 'T' + number_format (amount, 2) + "\n"
+            data += 'P' + payee + "\n"
+            data += 'M' + tr['desc1'] + ' ' + tr['desc2'] + ' ' + tr['desc3'] + ' ' + tr['desc4'] + "\n"
+            data += "^\n"
+            fout.write(data)
+    except EnvironmentError as err:
+        print "{0}: chyba zápisu: {1}".format(os.path.basename(file), err)
+    finally:
+        if fout is not None:
+            fout.close()
 
 
 
@@ -184,7 +193,7 @@ if __name__ == '__main__':
                 mojebanka_to_qif(transactions)
             fin.close()
     except EnvironmentError as err:
-        print "{0}: chyba při konverzi: {1}".format(os.path.basename(file), err)
+        print "{0}: chyba čtení: {1}".format(os.path.basename(file), err)
     finally:
         if fin is not None:
             fin.close()
