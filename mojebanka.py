@@ -180,10 +180,14 @@ if __name__ == '__main__':
 
     files = _collect_files_from_args(args)
 
-    if len(files):
-        files = list(set(files))
-    else:
+    if len(files) == 0:
+        print "Argumenty neobsahovaly zádne platne soubory."
         optparser.print_help();
+        exit(1)
+    elif options.format not in ('cli', 'qif'):
+        print "Neznamy format \"%s\"" % (options.format)
+        optparser.print_help();
+        exit(1)
 
     fin = None
     try:
