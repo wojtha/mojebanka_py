@@ -8,6 +8,7 @@ banky, kde je povolen export transakcí pouze do textového formátu.
 ## Použití
 
 python mojebanka.py --format=qif Tisk_20110910153349.txt
+
 python mojebanka.py --format=cvs *.txt
 
 ## Parametry
